@@ -21,10 +21,9 @@ public class PlayerCombat : MonoBehaviour
     {
         if(Time.time >= nextAttackTime)
         {
-            // TODO: generalize this in the input manager
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetAxisRaw("Attack") == 1)
             {
-                Debug.Log("Space key hit");
+                Debug.Log("Attack key hit");
                 Attack();
                 nextAttackTime = Time.time + 1f / attackRate;
             }  
