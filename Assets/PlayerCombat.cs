@@ -7,11 +7,19 @@ using UnityEngine;
 public class PlayerCombat : MonoBehaviour
 {
 
-    public Transform attackPoint;
-    public float attackRange = 1.5f;
+    public Animator animator;
+
+    public Transform basicAttackPoint;
+    public float basicAttackRange = 1.5f;
+
+    public Transform rangeAttackPoint;
+    public float rangeAttackRange = 2.0f;
+
     public LayerMask enemyLayers;
 
-    public int attackDamage = 40;
+    public int basicAttackDamage = 20;
+    public int rangeAttackDamage = 10;
+
 
     public float attackRate = 2f;
     float nextAttackTime = 0f;
@@ -19,36 +27,57 @@ public class PlayerCombat : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        animator.SetBool("RangeAttack", Input.GetAxisRaw("RangeAttack") == 1);
+
         if(Time.time >= nextAttackTime)
         {
-            if (Input.GetAxisRaw("Attack") == 1)
+            if (Input.GetAxisRaw("BasicAttack") == 1)
             {
-                Debug.Log("Attack key hit");
-                Attack();
+                BasicAttack();
                 nextAttackTime = Time.time + 1f / attackRate;
-            }  
+            }  else if (Input.GetAxisRaw("RangeAttack") == 1) {
+                RangeAttack();
+                nextAttackTime = Time.time + 1f / attackRate;
+            }
         }
     }
 
-    void Attack()
+    void BasicAttack()
     {
         //TODO: add starting the animation here once we have the assets (see 3:30 in Brackeys video)
 
         // find enemies in range of attack
-        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayers);
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(basicAttackPoint.position, basicAttackRange, enemyLayers);
     
         // damage the enemies
         foreach(Collider2D enemy in hitEnemies)
         {
-            Debug.Log("We hit " + enemy.name);
-            enemy.GetComponent<Enemy>().TakeDamage(attackDamage);
+            Debug.Log("We hit " + enemy.name + " with basic attack");
+            enemy.GetComponent<Enemy>().TakeDamage(basicAttackDamage);
+        }
+    }
+
+        void RangeAttack()
+    {
+        //TODO: add starting the animation here once we have the assets (see 3:30 in Brackeys video)
+
+        // find enemies in range of attack
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(rangeAttackPoint.position, rangeAttackRange, enemyLayers);
+    
+        // damage the enemies
+        foreach(Collider2D enemy in hitEnemies)
+        {
+            Debug.Log("We hit " + enemy.name + " with range attack");
+            enemy.GetComponent<Enemy>().TakeDamage(rangeAttackDamage);
         }
     }
 
     void OnDrawGizmosSelected()
     {
-        if(attackPoint != null){
-            Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+        if(basicAttackPoint != null){
+            Gizmos.DrawWireSphere( basicAttackPoint.position, basicAttackRange);
+        } else if(rangeAttackPoint != null) {
+            Gizmos.DrawWireSphere( rangeAttackPoint.position, rangeAttackRange);
         }
     }
 }
